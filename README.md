@@ -41,6 +41,6 @@
 
 ## Details
 
-[Niagara与GIS系统的集成](<https://github.com/NiagarasDeveloperAlliance/bmaps/blob/master/Integrate-Niagara-with-GIS.pdf>)
+[Niagara与GIS系统的集成](<Integrate-Niagara-with-GIS.pdf>)
 
 分享于 2019 Tridium 中国合作伙伴峰会开发培训
