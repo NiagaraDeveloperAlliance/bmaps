@@ -2,7 +2,7 @@
 
 ## Introduction
 
-该项目参考 [gmaps-example](https://github.com/tridium/gmaps-example)，展示了如何将百度地图 JavaScript API 集成进 bajaux Web Widget。
+该项目参考 [gmaps-example](https://github.com/tridium/gmaps-example)，展示了如何将百度地图 JavaScript API 通过 bajaux Web Widget 的形式集成到 Niagara 中。
 
 ## Author
 
