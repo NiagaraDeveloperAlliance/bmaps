@@ -1,0 +1,19 @@
+<a target='new' href='javascript:window.top.niagara.env.hyperlink("{{ord}}");'>{{displayName}}</a>
+<br />
+<br />
+<table border='1'>
+  <tr>
+    <th>{{name}}</th>
+    <th>{{display}}</th>
+  </tr>  
+  {{#if rows}}
+    {{#each rows}}
+    <tr>
+      <td>{{displayName}}</td>
+      <td>{{value}}</td>
+    </tr>
+    {{/each}}
+  {{/if}}
+</table>
+<br />
+<br />

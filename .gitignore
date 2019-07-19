@@ -1,0 +1,9 @@
+node_modules
+*~
+*.iml
+.gradle/
+.idea/
+build/
+out/
+module-include.xml
+moduleTest-include.xml
