@@ -1,19 +1,36 @@
 <a target='new' href='javascript:window.top.niagara.env.hyperlink("{{ord}}");'>{{displayName}}</a>
+{{title}}
+lalalalla
 <br />
 <br />
 <table border='1'>
-  <tr>
+  {{!-- <tr>
     <th>{{name}}</th>
     <th>{{display}}</th>
-  </tr>  
-  {{#if rows}}
+  </tr>   --}}
+  
+  <tr>
+    <th>Total alarms 
+    </th>
+    <td>{{alarmCount}}</td>
+  </tr>
+</table>
+<div class="info-window-props-container">
+{{#if rows}}
     {{#each rows}}
-    <tr>
-      <td>{{displayName}}</td>
-      <td>{{value}}</td>
-    </tr>
+    {{!-- <tr> --}}
+      <div class="info-window-props-child">
+        <h3>{{displayName}}</h3>
+        {{!-- <div class="break"></div> --}}
+       <span> {{value}}</span>
+       {{#if alarm}}
+       <span class="alarm-text"> alarm</span>
+       {{/if}}
+      </div>
+      
+    {{!-- </tr> --}}
     {{/each}}
   {{/if}}
-</table>
+</div>
 <br />
 <br />
