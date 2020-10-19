@@ -50,7 +50,6 @@ define([
     var // => '12.0pt sans-serif'
       DEFAULT_FONT_VALUE = 'null',
       DEFAULT_FONT_SIZE = 12;
-    that.globalInfoWindowLock = false;
     that
       .properties()
       .add('ak', 'ZwiEh3WHhKnNRX8Kb9i56NrBBk1VkwDq')
@@ -59,11 +58,6 @@ define([
         name: 'zoom',
         value: 15,
         typeSpec: 'baja:Integer',
-      })
-      .add({
-        name: 'theme',
-        value: 'acked',
-        typeSpec: 'alarm:AckState',
       })
       .add('footprint', false)
       .add({
@@ -83,7 +77,9 @@ define([
         name: 'font',
         value: DEFAULT_FONT_VALUE,
         typeSpec: 'gx:Font',
-      });
+      })
+      .add('showAlarmIcon', true)
+      .add('search3dAnimation', false); // not working yet
 
     subscriberMixIn(that);
   };
@@ -139,20 +135,21 @@ define([
   }
 
   BMapsWidget.prototype.doInitialize = function (dom) {
-    var Mario_IMAGE = '/module/bmaps/rc/mario.png';
     var that = this;
     console.fine('BMapsWidget initializing');
     dom.addClass(BMAPS_CLASS);
     dom.html(bMapsTemplate({}));
 
+    // todo remove this
     var mapApi = 'https://api.map.baidu.com/api?v=3.0&ak=' + that.properties().getValue('ak');
+
     var mapGLApi =
       'https://api.map.baidu.com/api?type=webgl&v=1.0&ak=' + that.properties().getValue('ak');
     return new Promise(function (resolve, reject) {
       // wait for Baidu Map API to load inside the page
       require(['async!' + mapApi, 'async!' + mapGLApi], function () {
         console.fine('Baidu Map API initialized');
-
+        that.points = {};
         // utilize Baidu Map JavaScript
         that.$bmaps = BMapGL;
         that.$map = new that.$bmaps.Map(getMapContainer(dom));
@@ -163,17 +160,6 @@ define([
         that.$map.addControl(new that.$bmaps.NavigationControl3D());
         that.$map.addControl(new that.$bmaps.ScaleControl());
         that.$map.addControl(new that.$bmaps.MapTypeControl());
-
-        // var coloredMarker = new that.$bmaps.Marker(new that.$bmaps.Point(point.lng, point.lat - 0.01), {
-        //   // 指定Marker的icon属性为Symbol
-        //   icon: new that.$bmaps.Symbol(BMap_Symbol_SHAPE_POINT, {
-        //     scale: 1, //图标缩放大小
-        //     fillColor: 'orange', //填充颜色
-        //     fillOpacity: 0.8, //填充透明度
-        //   }),
-        // });
-        // that.$map.addOverlay(coloredMarker);
-        // coloredMarker.setAnimation(BMAP_ANIMATION_BOUNCE);
 
         // create center point icon
         var markerIcon = that.properties().getValue('icon');
@@ -230,10 +216,53 @@ define([
         });
 
         function setPlace() {
-          that.$map.clearOverlays(); //清除地图上所有覆盖物
+          // that.$map.clearOverlays(); //清除地图上所有覆盖物
           function myFun() {
             var pp = local.getResults().getPoi(0).point; //获取第一个智能搜索的结果
-            that.$map.centerAndZoom(pp, 18);
+
+            if (that.properties().getValue('search3dAnimation')) {
+              that.$map.setTilt(50); // 设置地图初始倾斜角
+              // console.fine(JSON.stringify(local.getResults().getPoi(0)));
+              // console.fine(point);
+              var keyFrames = [
+                {
+                  center: point,
+                  zoom: 18,
+                  // tilt: 50,
+                  // heading: 0,
+                  percentage: 0,
+                },
+                {
+                  center: new that.$bmaps.Point(pp.lng, pp.lag),
+                  zoom: 19,
+                  // tilt: 70,
+                  // heading: 0,
+                  percentage: 1,
+                },
+              ];
+              var opts = {
+                // duration: 3000,
+                // delay: 1000,
+                // interation: 'INFINITE',
+              };
+
+              // 声明动画对象
+              var animation = new BMapGL.ViewAnimation(keyFrames, opts);
+              // 监听事件
+              animation.addEventListener('animationstart', function (e) {
+                console.fine('start');
+              });
+              animation.addEventListener('animationiterations', function (e) {
+                console.fine('onanimationiterations');
+              });
+              animation.addEventListener('animationend', function (e) {
+                console.fine('end');
+              });
+              // 开始播放动画
+              setTimeout(that.$map.startViewAnimation(animation), 0);
+            } else {
+              that.$map.centerAndZoom(pp, 18);
+            }
             that.$map.addOverlay(new that.$bmaps.Marker(pp)); //添加标注
           }
           var local = new that.$bmaps.LocalSearch(that.$map, {
@@ -259,10 +288,7 @@ define([
    * @returns {String} The icon to use for the marker.
    */
   function getMarkerIcon(comp) {
-    if (isAlarm(comp)) {
-      return ALARM_IMAGE_URI;
-    }
-    return OK_IMAGE_URI;
+    return isAlarm(comp) ? ALARM_IMAGE_URI : OK_IMAGE_URI;
   }
 
   function isAlarm(comp) {
@@ -290,179 +316,204 @@ define([
       map = widget.$map,
       latLong = decodeLatLong(comp.get(baja.ComponentTags.idToSlotName('n:geoCoord'))),
       pnt = new bmaps.Point(latLong.lng, latLong.lat),
-      icon = new bmaps.Icon(getMarkerIcon(comp), new bmaps.Size(12, 20)),
-      // marker = new bmaps.Marker(pnt, {
-      //   icon: new bmaps.Symbol(BMap_Symbol_SHAPE_POINT, {
-      //     scale: 1, //图标缩放大小
-      //     fillColor: 'green', //填充颜色
-      //     fillOpacity: 0.8, //填充透明度
-      //   }),
-      //   title: comp.getDisplayName(),
-      // }),
+      // todo : size global macro, now init with ok
+      icon = new bmaps.Icon(OK_IMAGE_URI, new bmaps.Size(12, 20)),
       marker = new bmaps.Marker(pnt, {
         icon: icon,
         title: comp.getDisplayName(),
       }),
       infoWindow = new bmaps.InfoWindow(),
       updateInfoContents;
-    // Log.log('pnt', latLong);
     var compSub = new baja.Subscriber();
+    var childComps;
     var updateInfoContentsWrapper;
-    // var updateLock = false;
+    var updateInfoContentsWrapperDebounce;
+    var hasAlarm = false;
+    var title = comp.getDisplay('title') || comp.getDisplayName();
+    // console.fine(title);
+    // this requires constantly subscribe all the points, so performance is
+    // bad, ony enable this when user enables
+    var showAlarmIcon = widget.properties().getValue('showAlarmIcon');
+
     // add marker to the map
     map.addOverlay(marker);
+    widget.points[title] = latLong;
+    
+    
+    var compOrd = comp.getNavOrd().relativizeToSession().toString();
+    var ordATag =
+      "<a target='new' href='javascript:window.top.niagara.env.hyperlink(\"" +
+        compOrd +
+        '");\'>' +
+        title+ '</a>';
+    infoWindow.setTitle(ordATag);
+    infoWindow.setHeight(600);
 
-    widget.getSubscriber().attach('changed', function () {
+    // parent component is the one with tag 'geoCoord'
+    function isParentComponentStateOK() {
+      return _.every(childComps, function (childComp) {
+        return !isAlarm(childComp);
+      });
+    }
+
+    function getParentComponentMarkerIcon() {
+      return isParentComponentStateOK() ? OK_IMAGE_URI : ALARM_IMAGE_URI;
+    }
+
+    function updateIcon() {
+      var newIcon = new bmaps.Icon(getParentComponentMarkerIcon(), new bmaps.Size(12, 20));
+      marker.setIcon(newIcon);
+    }
+
+    fetchChildren()
+      .then(function () {
+        updateIcon();
+        // since we already subscribe all the points before click
+        // the updateIcon function does not seem to a lot of work,
+        // it might be ok to run this without the if statement,
+        // we just need to unsubscribe after close
+        if (showAlarmIcon) {
+          compSub.attach('changed', _.debounce(updateIcon, 200));
+        }
+      })
+      .catch(function (err) {
+        console.fine('failed: update icon ' + err);
+      });
+
+    function fetchChildren() {
+      return new Promise(function (resolve, reject) {
+        comp
+          .relations()
+          .then(function (relations) {
+            var childOrds = relations
+              .getAll() // todo get by id
+              .filter(function (relation) {
+                return (
+                  relation.getId().toString() === widget.properties().getValue('childRelation')
+                );
+              })
+              // .map((relation) => baja.Ord.make('station:|'+relation.getEndpointOrd().toString()));
+              .map(function (relation) {
+                return relation.getEndpointOrd();
+              });
+
+            return new baja.BatchResolve(childOrds).resolve({
+              base: comp,
+              subscriber: compSub,
+            });
+          })
+          .then(function (batchResolve) {
+            childComps = batchResolve.getTargetObjects();
+            resolve();
+          })
+          .catch(function (err) {
+            console.fine('failed: fetchChildren: ' + err);
+            reject();
+          });
+      });
+    }
+    
+    updateInfoContents = function () {
       if (this === comp) {
-        var icon = new bmaps.Icon(getMarkerIcon(comp), new bmaps.Size(12, 20));
-        marker.setIcon(icon);
+        console.fine('running update');
+        var data = {
+          ord: comp.getNavOrd().relativizeToSession().toString(),
+          displayName: comp.getDisplay('title') || comp.getDisplayName(),
+          // name: LEX.get('name'),
+          // display: LEX.get('display'),
+          rows: [],
+          alarmCount: 0,
+        };
+        _.each(childComps, function (comp) {
+          var row = {
+            displayName: comp.getDisplayName(),
+            value: '',
+          };
+          if (isAlarm(comp)) {
+            data.alarmCount += 1;
+            row.alarm = true;
+          }
+          var outVal = comp.getValueOf('out');
+          if (!outVal) {
+            data.rows.push(row);
+            return;
+          }
+          var outValString = outVal.toString();
+          var index = outValString.indexOf('{'); //!!!!!!!!!! very bad
+          var displayValue = outValString.substring(0, index);
+          row.value = displayValue;
+          data.rows.push(row);
+        });
+        // console.fine(JSON.stringify(data.rows));
+
+        // ! for componenet itself (run once when click) slot should
+        // ! be summary and should not change frequently
+
+        var targetSummarySlots = ['title', 'description', 'imgSrc'];
+
+        comp
+          .getSlots()
+          .flags(baja.Flags.SUMMARY)
+          .each(function (slot) {
+            var displayName = comp.getDisplayName(slot);
+            // console.fine(slot);
+            if (targetSummarySlots.includes(displayName)) {
+              data[displayName] = comp.getDisplay(slot);
+              // console.fine(data);
+              return;
+            }
+            // data.rows = data.rows || [];
+            data.rows.push({
+              displayName: comp.getDisplayName(slot),
+              value: comp.getDisplay(slot) || comp.get(slot),
+            });
+          });
+        // console.fine(JSON.stringify(data));
+        // console.fine(data.title);
+        // infoWindow.setTitle(ordATag);
+
+        infoWindow.setContent(popupTemplate(data));
+        // infoWindow.setMaxContent(popupTemplate(data));
+
+        // infoWindow.enableMaximize();
+        if (infoWindow.isOpen()) {
+          // console.info('redraw window');
+          // redraw current infowindow
+          infoWindow.redraw();
+        } else {
+          // Log.info('close and draw new window');
+          map.openInfoWindow(infoWindow, pnt);
+          // infoWindow.maximize();
+        }
+
       }
-    });
-    // function comparePoint(p1, p2) {
-    //   return p1 && p2 && p1.lng === p2.lng && p1.lat === p2.lat;
-    // }
+    };
+    updateInfoContentsWrapper = function () {
+      // console.fine(comp.getDisplayName())
+      return updateInfoContents.call(comp);
+    };
+
+    updateInfoContentsWrapperDebounce = _.debounce(updateInfoContentsWrapper, 500);
 
     marker.addEventListener('click', function () {
-      // console.fine('click');
-      updateInfoContents = function () {
-        // Log.info(updateLock, 'updateLock');
-        if (this === comp && !widget.globalInfoWindowLock) {
-          widget.globalInfoWindowLock = true;
-          // updateLock = true;
-          // globalInfoWindowLock = true;
-          console.fine('running update');
-          let childOrds;
-          var data = {
-            ord: comp.getNavOrd().relativizeToSession().toString(),
-            displayName: comp.getDisplayName(),
-            name: LEX.get('name'),
-            display: LEX.get('display'),
-            rows: [],
-            alarmCount: 0,
-          };
-
-          comp
-            .relations()
-            .then(function (relations) {
-              childOrds = relations
-                .getAll() // todo get by id
-                .filter(function (relation) {
-                  return (
-                    relation.getId().toString() === widget.properties().getValue('childRelation')
-                  );
-                })
-                // .map((relation) => baja.Ord.make('station:|'+relation.getEndpointOrd().toString()));
-                .map(function (relation) {
-                  return relation.getEndpointOrd();
-                });
-              // var subscriber = new baja.Subscriber(); // Also batch subscribe all resolved Components
-              // console.fine(childOrds);
-
-              return new baja.BatchResolve(childOrds).resolve({
-                base: comp,
-                subscriber: compSub,
-              });
-            })
-            .then(function (batchResolve) {
-              var comps = batchResolve.getTargetObjects();
-              // console.fine(children)
-              _.each(comps, function (comp) {
-                var row = {
-                  displayName: comp.getDisplayName(),
-                  value: '',
-                };
-                if (isAlarm(comp)) {
-                  data.alarmCount += 1;
-                  row.alarm = true;
-                }
-                var outVal = comp.getValueOf('out');
-                if (!outVal) {
-                  data.rows.push(row);
-                  return;
-                }
-                var outValString = outVal.toString();
-                var index = outValString.indexOf('{'); //!!!!!!!!!! very bad
-                var displayValue = outValString.substring(0, index);
-                row.value = displayValue;
-                data.rows.push(row);
-              });
-              // console.fine(JSON.stringify(data.rows));
-              var targetSlots = ['title'];
-              comp
-                .getSlots()
-                .flags(baja.Flags.SUMMARY)
-                .each(function (slot) {
-                  var displayName = comp.getDisplayName(slot);
-                  // console.fine(slot);
-                  if (targetSlots.includes(displayName)) {
-                    data[displayName] = 'new title';
-                    // console.fine(data);
-                    return;
-                  }
-                  data.rows = data.rows || [];
-                  data.rows.push({
-                    displayName: comp.getDisplayName(slot),
-                    value: comp.getDisplay(slot) || comp.get(slot),
-                  });
-                });
-
-              infoWindow.setContent(popupTemplate(data));
-              // Log.log(comparePoint(map.getInfoWindow().getPosition(), pnt));
-              // Log.log(pnt.lng);
-              // Log.log(infoWindow.isOpen());
-              if (
-                infoWindow.isOpen()
-                // map.getInfoWindow() &&
-                // comparePoint(map.getInfoWindow().getPosition(), pnt)
-              ) {
-                // Log.info('redraw window');
-                // redraw current infowindow
-                infoWindow.redraw();
-              } else {
-                // Log.info('close and draw new window');
-                map.openInfoWindow(infoWindow, pnt);
-              }
-              // updateLock = false;
-              widget.globalInfoWindowLock = false;
-            })
-            .catch(function (err) {
-              console.fine('failed: updateInfoContents: ' + err);
-            });
-        }
-      };
-      // setInterval(updateInfoContentsWrapper, 1000);
-      updateInfoContentsWrapper = function () {
-        // console.fine(comp.getDisplayName())
-        return updateInfoContents.call(comp);
-      };
-      // if (!infoWindow.isOpen()) {
-      // Log.log('isclose');
+      // when click we only attach the updateInfoContentsWrapperDebounce function
       updateInfoContentsWrapper();
-      compSub.attach('changed', updateInfoContentsWrapper);
-      // }
-
-      widget.getSubscriber().attach('changed', updateInfoContents);
+      compSub.attach('changed', updateInfoContentsWrapperDebounce);
     });
-
-    // marker.addEventListener('mouseout', function () {
-    //   widget.getSubscriber().detach('changed', updateInfoContents);
-    // });
-    // marker.addEventListener('mouseover', function () {
-    //   updateInfoContents.call(comp);
-    //   // widget.getSubscriber().attach('changed', updateInfoContents);
-    // });
 
     infoWindow.addEventListener('close', function () {
       console.fine('close event fired');
-      // console.fine('detach updateInfoContentsWrapper');
-
-      widget.getSubscriber().detach('changed', updateInfoContents);
-      compSub.detach('changed', updateInfoContentsWrapper);
+      compSub.detach('changed', updateInfoContentsWrapperDebounce);
+      if (!showAlarmIcon) {
+        compSub.unsubscribeAll();
+      }
     });
     infoWindow.addEventListener('clickclose', function () {
-      // console.fine('clickclose');
-      widget.getSubscriber().detach('changed', updateInfoContents);
-      compSub.detach('changed', updateInfoContentsWrapper);
+      compSub.detach('changed', updateInfoContentsWrapperDebounce);
+
+      if (!showAlarmIcon) {
+        compSub.unsubscribeAll();
+      }
     });
   }
 

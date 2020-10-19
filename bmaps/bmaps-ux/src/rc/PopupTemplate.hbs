@@ -1,8 +1,12 @@
-<a target='new' href='javascript:window.top.niagara.env.hyperlink("{{ord}}");'>{{displayName}}</a>
-{{title}}
-lalalalla
-<br />
-<br />
+{{!-- <div class="info-window-container"> --}}
+  {{!-- <a target='new' href='javascript:window.top.niagara.env.hyperlink("{{ord}}");'>{{displayName}}</a> --}}
+{{!-- <h4>{{title}}</h4> --}}
+{{#if imgSrc}}
+<img src={{imgSrc}} width='100' height='100'alt="">
+{{/if}}
+{{#if description}}
+<p>{{description}}</p>
+{{/if}}
 <table border='1'>
   {{!-- <tr>
     <th>{{name}}</th>
@@ -34,3 +38,4 @@ lalalalla
 </div>
 <br />
 <br />
+{{!-- </div> --}}
