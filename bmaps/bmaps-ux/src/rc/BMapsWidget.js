@@ -1,3 +1,12 @@
+require.config({
+  paths: {
+    list: [
+      '//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min',
+      '/module/bmaps/rc/dist/list.min', // fallback
+    ],
+  },
+});
+
 define([
   'baja!',
   'baja!baja:IStatus',
@@ -10,11 +19,8 @@ define([
   'hbs!nmodule/bmaps/rc/PopupTemplate',
   'lex!bmaps',
   'log!bmaps',
-  // 'nmodule/js/rc/log/Log',
   'css!nmodule/bmaps/rc/BMapsWidgetStyle',
-  // '!nmodule/vrf/rc/bootstrap/js/bootstrap.bundle',
-  // 'css!nmodule/vrf/rc/bootstrap/css/bootstrap',
-  // 'css!nmodule/vrf/rc/fontawesome/css/fontawesome-all',
+  'list',
 ], function (
   baja,
   types,
@@ -142,14 +148,13 @@ define([
 
     // todo remove this
     var mapApi = 'https://api.map.baidu.com/api?v=3.0&ak=' + that.properties().getValue('ak');
-
     var mapGLApi =
       'https://api.map.baidu.com/api?type=webgl&v=1.0&ak=' + that.properties().getValue('ak');
     return new Promise(function (resolve, reject) {
       // wait for Baidu Map API to load inside the page
       require(['async!' + mapApi, 'async!' + mapGLApi], function () {
         console.fine('Baidu Map API initialized');
-        that.points = {};
+        that.points = [];
         // utilize Baidu Map JavaScript
         that.$bmaps = BMapGL;
         that.$map = new that.$bmaps.Map(getMapContainer(dom));
@@ -157,7 +162,7 @@ define([
         var point = new that.$bmaps.Point(central.lng, central.lat);
         that.$map.centerAndZoom(point, that.properties().getValue('zoom'));
         that.$map.enableScrollWheelZoom(true);
-        that.$map.addControl(new that.$bmaps.NavigationControl3D());
+        // that.$map.addControl(new that.$bmaps.NavigationControl3D());
         that.$map.addControl(new that.$bmaps.ScaleControl());
         that.$map.addControl(new that.$bmaps.MapTypeControl());
 
@@ -176,102 +181,39 @@ define([
           });
         }
 
-        //! api for search
         function G(id) {
           return document.getElementById(id);
         }
-        var ac = new that.$bmaps.Autocomplete({ input: 'suggestId', location: that.$map }); //建立一个自动完成的对象
 
-        ac.addEventListener('onhighlight', function (e) {
-          //   //鼠标放在下拉列表上的事件
-          var str = '';
-          var _value = e.fromitem.value;
-          var value = '';
-          if (e.fromitem.index > -1) {
-            value =
-              _value.province + _value.city + _value.district + _value.street + _value.business;
-          }
-          str = 'FromItem<br />index = ' + e.fromitem.index + '<br />value = ' + value;
+        var options = {
+          item: 'search-item',
+          valueNames: ['title'],
+        };
 
-          value = '';
-          if (e.toitem.index > -1) {
-            _value = e.toitem.value;
-            value =
-              _value.province + _value.city + _value.district + _value.street + _value.business;
+        var searchList = new List('search-list', options, that.points);
+        that.searchList = searchList;
+        // G('suggestId').addEventListener('keyup', function (e) {
+        //    $('.list').show();
+        // });
+
+        //  G('suggestId').addEventListener('focus', function (e) {
+        //    $('.list').show();
+        //  });
+        //  G('suggestId').addEventListener('focusout', function (e) {
+        //    $('.list').hide();
+        //  });
+
+        searchList.on('updated', function (list) {
+          // we want to only show the results when searching, this is kinda a hacky way,
+          // we do not want to show the points when the result is the whole list, 
+          if (list.matchingItems.length == list.items.length) {
+            $('.list').hide();
+          } else {
+            $('.list').show();
           }
-          str += '<br />ToItem<br />index = ' + e.toitem.index + '<br />value = ' + value;
-          G('searchResultPanel').innerHTML = str;
+          //  $('.list').show();
         });
 
-        var myValue;
-        ac.addEventListener('onconfirm', function (e) {
-          //鼠标点击下拉列表后的事件
-          var _value = e.item.value;
-          myValue =
-            _value.province + _value.city + _value.district + _value.street + _value.business;
-          G('searchResultPanel').innerHTML =
-            'onconfirm<br />index = ' + e.item.index + '<br />myValue = ' + myValue;
-
-          setPlace();
-        });
-
-        function setPlace() {
-          // that.$map.clearOverlays(); //清除地图上所有覆盖物
-          function myFun() {
-            var pp = local.getResults().getPoi(0).point; //获取第一个智能搜索的结果
-
-            if (that.properties().getValue('search3dAnimation')) {
-              that.$map.setTilt(50); // 设置地图初始倾斜角
-              // console.fine(JSON.stringify(local.getResults().getPoi(0)));
-              // console.fine(point);
-              var keyFrames = [
-                {
-                  center: point,
-                  zoom: 18,
-                  // tilt: 50,
-                  // heading: 0,
-                  percentage: 0,
-                },
-                {
-                  center: new that.$bmaps.Point(pp.lng, pp.lag),
-                  zoom: 19,
-                  // tilt: 70,
-                  // heading: 0,
-                  percentage: 1,
-                },
-              ];
-              var opts = {
-                // duration: 3000,
-                // delay: 1000,
-                // interation: 'INFINITE',
-              };
-
-              // 声明动画对象
-              var animation = new BMapGL.ViewAnimation(keyFrames, opts);
-              // 监听事件
-              animation.addEventListener('animationstart', function (e) {
-                console.fine('start');
-              });
-              animation.addEventListener('animationiterations', function (e) {
-                console.fine('onanimationiterations');
-              });
-              animation.addEventListener('animationend', function (e) {
-                console.fine('end');
-              });
-              // 开始播放动画
-              setTimeout(that.$map.startViewAnimation(animation), 0);
-            } else {
-              that.$map.centerAndZoom(pp, 18);
-            }
-            that.$map.addOverlay(new that.$bmaps.Marker(pp)); //添加标注
-          }
-          var local = new that.$bmaps.LocalSearch(that.$map, {
-            //智能搜索
-            onSearchComplete: myFun,
-          });
-          local.search(myValue);
-        }
-        //! api for search
         resolve();
       });
     });
@@ -316,11 +258,12 @@ define([
       map = widget.$map,
       latLong = decodeLatLong(comp.get(baja.ComponentTags.idToSlotName('n:geoCoord'))),
       pnt = new bmaps.Point(latLong.lng, latLong.lat),
+      title = comp.getDisplay('title') || comp.getDisplayName(),
       // todo : size global macro, now init with ok
-      icon = new bmaps.Icon(OK_IMAGE_URI, new bmaps.Size(12, 20)),
+      icon = new bmaps.Icon(ALARM_IMAGE_URI, new bmaps.Size(12, 20)),
       marker = new bmaps.Marker(pnt, {
         icon: icon,
-        title: comp.getDisplayName(),
+        title: title,
       }),
       infoWindow = new bmaps.InfoWindow(),
       updateInfoContents;
@@ -329,25 +272,93 @@ define([
     var updateInfoContentsWrapper;
     var updateInfoContentsWrapperDebounce;
     var hasAlarm = false;
-    var title = comp.getDisplay('title') || comp.getDisplayName();
     // console.fine(title);
     // this requires constantly subscribe all the points, so performance is
     // bad, ony enable this when user enables
     var showAlarmIcon = widget.properties().getValue('showAlarmIcon');
 
-    // add marker to the map
-    map.addOverlay(marker);
-    widget.points[title] = latLong;
-    
-    
     var compOrd = comp.getNavOrd().relativizeToSession().toString();
     var ordATag =
       "<a target='new' href='javascript:window.top.niagara.env.hyperlink(\"" +
-        compOrd +
-        '");\'>' +
-        title+ '</a>';
+      compOrd +
+      '");\'>' +
+      title +
+      '</a>';
     infoWindow.setTitle(ordATag);
     infoWindow.setHeight(600);
+
+    // add marker to the map
+    map.addOverlay(marker);
+
+    widget.searchList.add({
+      title: title,
+      pos: latLong,
+    });
+    var target = {
+      title: title,
+      pos: latLong,
+      infoWindow: infoWindow,
+    };
+    widget.points.push(target);
+
+    widget.searchList.list.lastElementChild.addEventListener('click', function (e) {
+      setPlace(target);
+    });
+
+    function setPlace(target) {
+      $('.list').hide();
+      var pos = target.pos;
+      var point = new bmaps.Point(pos.lng, pos.lat);
+      var infoWindow = target.infoWindow;
+      if (widget.properties().getValue('search3dAnimation')) {
+        map.setTilt(50); // 设置地图初始倾斜角
+        // console.fine(JSON.stringify(local.getResults().getPoi(0)));
+        // console.fine(point);
+        var keyFrames = [
+          {
+            center: point,
+            zoom: 18,
+            // tilt: 50,
+            // heading: 0,
+            percentage: 0,
+          },
+          {
+            center: new bmaps.Point(pp.lng, pp.lag),
+            zoom: 19,
+            // tilt: 70,
+            // heading: 0,
+            percentage: 1,
+          },
+        ];
+        var opts = {
+          // duration: 3000,
+          // delay: 1000,
+          // interation: 'INFINITE',
+        };
+
+        // 声明动画对象
+        var animation = new BMapGL.ViewAnimation(keyFrames, opts);
+        // 监听事件
+        animation.addEventListener('animationstart', function (e) {
+          console.fine('start');
+        });
+        animation.addEventListener('animationiterations', function (e) {
+          console.fine('onanimationiterations');
+        });
+        animation.addEventListener('animationend', function (e) {
+          console.fine('end');
+        });
+        // 开始播放动画
+        setTimeout(map.startViewAnimation(animation), 0);
+      } else {
+        map.centerAndZoom(point, 18);
+      }
+
+      // map.addOverlay(new bmaps.Marker(point)); //添加标注
+      updateInfoContentsWrapper();
+      compSub.attach('changed', updateInfoContentsWrapperDebounce);
+      console.fine('setplace');
+    }
 
     // parent component is the one with tag 'geoCoord'
     function isParentComponentStateOK() {
@@ -361,8 +372,12 @@ define([
     }
 
     function updateIcon() {
-      var newIcon = new bmaps.Icon(getParentComponentMarkerIcon(), new bmaps.Size(12, 20));
-      marker.setIcon(newIcon);
+      var ParentComponentMarkerIcon = getParentComponentMarkerIcon();
+      if (ParentComponentMarkerIcon != marker.getIcon().imageUrl) {
+        console.fine('update icon');
+        var newIcon = new bmaps.Icon(ParentComponentMarkerIcon, new bmaps.Size(12, 20));
+        marker.setIcon(newIcon);
+      }
     }
 
     fetchChildren()
@@ -412,7 +427,7 @@ define([
           });
       });
     }
-    
+
     updateInfoContents = function () {
       if (this === comp) {
         console.fine('running update');
@@ -485,7 +500,6 @@ define([
           map.openInfoWindow(infoWindow, pnt);
           // infoWindow.maximize();
         }
-
       }
     };
     updateInfoContentsWrapper = function () {

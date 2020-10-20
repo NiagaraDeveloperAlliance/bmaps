@@ -9,18 +9,24 @@
             height: 100%;
             overflow: hidden;
             margin: 0;
-            font-family: "微软雅黑";
+            font-family:sans-serif;
         }
-        #container{height:95%;width:100%;}
-		#r-result{width:100%;}
     </style>
     <title>地图展示</title>
 </head>
 <body>
+    
 <div id="container"></div>
-<div id="allmap" ></div>
-<div id="r-result">请输入:<input type="text" id="suggestId" size="20" value="百度" style="width:150px;" /></div>
-<div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+<div id="search-list" class="search-list">
+    <input type="text" class="search" id="suggestId" size="20" placeholder="Search" style="width:150px;" autocomplete="off"/>
+    <ul class="list" style="display: none;" ></ul>
+</div>
 
+<div style="display:none;">
+  <!-- A template element is needed when list is empty, TODO: needs a better solution -->
+  <li id="search-item">
+   <h3 class="title btn"></h3>
+  </li>
+</div>
 </body>
 </html>

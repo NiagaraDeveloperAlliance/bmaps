@@ -7,24 +7,22 @@
 {{#if description}}
 <p>{{description}}</p>
 {{/if}}
-<table border='1'>
+
   {{!-- <tr>
     <th>{{name}}</th>
     <th>{{display}}</th>
   </tr>   --}}
   
-  <tr>
-    <th>Total alarms 
-    </th>
-    <td>{{alarmCount}}</td>
-  </tr>
-</table>
+  <div>
+   <h5 style="display: inline;">Total alarms: {{alarmCount}}</h5>
+  </div>
+   
 <div class="info-window-props-container">
 {{#if rows}}
     {{#each rows}}
     {{!-- <tr> --}}
       <div class="info-window-props-child">
-        <h3>{{displayName}}</h3>
+        <h5>{{displayName}}</h5>
         {{!-- <div class="break"></div> --}}
        <span> {{value}}</span>
        {{#if alarm}}
