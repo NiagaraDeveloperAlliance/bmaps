@@ -6,6 +6,7 @@ require.config({
     ],
   },
 });
+// build failed
 
 define([
   'baja!',
@@ -20,7 +21,7 @@ define([
   'lex!bmaps',
   'log!bmaps',
   'css!nmodule/bmaps/rc/BMapsWidgetStyle',
-  'list',
+  'nmodule/bmaps/rc/dist/list.min',
 ], function (
   baja,
   types,
@@ -41,7 +42,7 @@ define([
     OK_IMAGE_URI = '/module/bmaps/rc/ok.png',
     ALARM_IMAGE_URI = '/module/bmaps/rc/alarm.gif',
     LEX = lexicons[0];
-
+  let x = 1;
   /**
    * Loads a map into a widget. Queries the station to display live data.
    *
