@@ -70,7 +70,7 @@ define([
         name: 'show3D',
         value: true,
         typeSpec: 'baja:Boolean',
-        metadata: { trueText: 'show3D', falseText: 'hide3D' },
+        metadata: { trueText: LEX.get('show3d'), falseText: LEX.get('hide3d') },
       })
       .add('icon', '')
       .add('childRelation', 'm:child')
@@ -165,6 +165,9 @@ define([
         // that.$map.addControl(new that.$bmaps.NavigationControl3D());
         that.$map.addControl(new that.$bmaps.ScaleControl());
         that.$map.addControl(new that.$bmaps.MapTypeControl());
+        // that.$map.addControl(new that.$bmaps.MapTypeControl());
+
+        that.$map.addControl(new that.$bmaps.ZoomControl());
 
         // create center point icon
         var markerIcon = that.properties().getValue('icon');
@@ -205,7 +208,7 @@ define([
 
         searchList.on('updated', function (list) {
           // we want to only show the results when searching, this is kinda a hacky way,
-          // we do not want to show the points when the result is the whole list, 
+          // we do not want to show the points when the result is the whole list,
           if (list.matchingItems.length == list.items.length) {
             $('.list').hide();
           } else {
@@ -442,7 +445,7 @@ define([
         _.each(childComps, function (comp) {
           var row = {
             displayName: comp.getDisplayName(),
-            value: '',
+            value: 'no data',
           };
           if (isAlarm(comp)) {
             data.alarmCount += 1;
