@@ -1,13 +1,3 @@
-require.config({
-  paths: {
-    list: [
-      '//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min',
-      '/module/bmaps/rc/dist/list.min', // fallback
-    ],
-  },
-});
-// build failed
-
 define([
   'baja!',
   'baja!baja:IStatus',
@@ -42,7 +32,8 @@ define([
     OK_IMAGE_URI = '/module/bmaps/rc/ok.png',
     ALARM_IMAGE_URI = '/module/bmaps/rc/alarm.gif',
     LEX = lexicons[0];
-  let x = 1;
+  // let x= 2;
+  // console.info(x)
   /**
    * Loads a map into a widget. Queries the station to display live data.
    *
@@ -75,18 +66,7 @@ define([
       })
       .add('icon', '')
       .add('childRelation', 'm:child')
-      .add({
-        name: 'textColor',
-        value: '#3a3a3a',
-        typeSpec: 'gx:Color',
-      })
-      .add({
-        name: 'font',
-        value: DEFAULT_FONT_VALUE,
-        typeSpec: 'gx:Font',
-      })
-      .add('showAlarmIcon', true)
-      .add('search3dAnimation', false); // not working yet
+      .add('alwaysSubscribeAllPoints', true);
 
     subscriberMixIn(that);
   };
@@ -196,16 +176,6 @@ define([
 
         var searchList = new List('search-list', options, that.points);
         that.searchList = searchList;
-        // G('suggestId').addEventListener('keyup', function (e) {
-        //    $('.list').show();
-        // });
-
-        //  G('suggestId').addEventListener('focus', function (e) {
-        //    $('.list').show();
-        //  });
-        //  G('suggestId').addEventListener('focusout', function (e) {
-        //    $('.list').hide();
-        //  });
 
         searchList.on('updated', function (list) {
           // we want to only show the results when searching, this is kinda a hacky way,
@@ -215,7 +185,6 @@ define([
           } else {
             $('.list').show();
           }
-          //  $('.list').show();
         });
 
         resolve();
@@ -273,13 +242,12 @@ define([
       updateInfoContents;
     var compSub = new baja.Subscriber();
     var childComps;
-    var updateInfoContentsWrapper;
-    var updateInfoContentsWrapperDebounce;
+    var updateInfoContents;
+    var updateInfoContentsDebounce;
     var hasAlarm = false;
-    // console.fine(title);
     // this requires constantly subscribe all the points, so performance is
     // bad, ony enable this when user enables
-    var showAlarmIcon = widget.properties().getValue('showAlarmIcon');
+    var alwaysSubscribeAllPoints = widget.properties().getValue('alwaysSubscribeAllPoints');
 
     var compOrd = comp.getNavOrd().relativizeToSession().toString();
     var ordATag =
@@ -293,7 +261,7 @@ define([
 
     // add marker to the map
     map.addOverlay(marker);
-
+    // this will add to dom automatically
     widget.searchList.add({
       title: title,
       pos: latLong,
@@ -358,9 +326,8 @@ define([
         map.centerAndZoom(point, 18);
       }
 
-      // map.addOverlay(new bmaps.Marker(point)); //添加标注
-      updateInfoContentsWrapper();
-      compSub.attach('changed', updateInfoContentsWrapperDebounce);
+      updateInfoContents();
+      compSub.attach('changed', updateInfoContentsDebounce);
       console.fine('setplace');
     }
 
@@ -391,7 +358,7 @@ define([
         // the updateIcon function does not seem to a lot of work,
         // it might be ok to run this without the if statement,
         // we just need to unsubscribe after close
-        if (showAlarmIcon) {
+        if (alwaysSubscribeAllPoints) {
           compSub.attach('changed', _.debounce(updateIcon, 200));
         }
       })
@@ -433,103 +400,93 @@ define([
     }
 
     updateInfoContents = function () {
-      if (this === comp) {
-        console.fine('running update');
-        var data = {
-          ord: comp.getNavOrd().relativizeToSession().toString(),
-          displayName: comp.getDisplay('title') || comp.getDisplayName(),
-          // name: LEX.get('name'),
-          // display: LEX.get('display'),
-          rows: [],
-          alarmCount: 0,
+      console.fine('updating info window');
+      var data = {
+        ord: comp.getNavOrd().relativizeToSession().toString(),
+        displayName: comp.getDisplay('title') || comp.getDisplayName(),
+        // name: LEX.get('name'),
+        // display: LEX.get('display'),
+        rows: [],
+        alarmCount: 0,
+      };
+      _.each(childComps, function (comp) {
+        var row = {
+          displayName: comp.getDisplayName(),
+          value: 'no data',
         };
-        _.each(childComps, function (comp) {
-          var row = {
-            displayName: comp.getDisplayName(),
-            value: 'no data',
-          };
-          if (isAlarm(comp)) {
-            data.alarmCount += 1;
-            row.alarm = true;
-          }
-          var outVal = comp.getValueOf('out');
-          if (!outVal) {
-            data.rows.push(row);
+        if (isAlarm(comp)) {
+          data.alarmCount += 1;
+          row.alarm = true;
+        }
+        var outVal = comp.getValueOf('out');
+        if (!outVal) {
+          data.rows.push(row);
+          return;
+        }
+        var outValString = outVal.toString();
+        var index = outValString.indexOf('{'); //!!!!!!!!!! very bad
+        var displayValue = outValString.substring(0, index);
+        row.value = displayValue;
+        data.rows.push(row);
+      });
+
+      // ! for componenet itself (run once when click) slot should
+      // ! be summary and should not change frequently
+
+      var targetSummarySlots = ['title', 'description', 'imgSrc'];
+
+      comp
+        .getSlots()
+        .flags(baja.Flags.SUMMARY)
+        .each(function (slot) {
+          var displayName = comp.getDisplayName(slot);
+          // console.fine(slot);
+          if (targetSummarySlots.includes(displayName)) {
+            data[displayName] = comp.getDisplay(slot);
+            // console.fine(data);
             return;
           }
-          var outValString = outVal.toString();
-          var index = outValString.indexOf('{'); //!!!!!!!!!! very bad
-          var displayValue = outValString.substring(0, index);
-          row.value = displayValue;
-          data.rows.push(row);
-        });
-        // console.fine(JSON.stringify(data.rows));
-
-        // ! for componenet itself (run once when click) slot should
-        // ! be summary and should not change frequently
-
-        var targetSummarySlots = ['title', 'description', 'imgSrc'];
-
-        comp
-          .getSlots()
-          .flags(baja.Flags.SUMMARY)
-          .each(function (slot) {
-            var displayName = comp.getDisplayName(slot);
-            // console.fine(slot);
-            if (targetSummarySlots.includes(displayName)) {
-              data[displayName] = comp.getDisplay(slot);
-              // console.fine(data);
-              return;
-            }
-            // data.rows = data.rows || [];
-            data.rows.push({
-              displayName: comp.getDisplayName(slot),
-              value: comp.getDisplay(slot) || comp.get(slot),
-            });
+          // data.rows = data.rows || [];
+          data.rows.push({
+            displayName: comp.getDisplayName(slot),
+            value: comp.getDisplay(slot) || comp.get(slot),
           });
-        // console.fine(JSON.stringify(data));
-        // console.fine(data.title);
-        // infoWindow.setTitle(ordATag);
+        });
 
-        infoWindow.setContent(popupTemplate(data));
-        // infoWindow.setMaxContent(popupTemplate(data));
+      infoWindow.setContent(popupTemplate(data));
+      // infoWindow.setMaxContent(popupTemplate(data));
 
-        // infoWindow.enableMaximize();
-        if (infoWindow.isOpen()) {
-          // console.info('redraw window');
-          // redraw current infowindow
-          infoWindow.redraw();
-        } else {
-          // Log.info('close and draw new window');
-          map.openInfoWindow(infoWindow, pnt);
-          // infoWindow.maximize();
-        }
+      // infoWindow.enableMaximize();
+      if (infoWindow.isOpen()) {
+        // console.info('redraw window');
+        // redraw current infowindow
+        infoWindow.redraw();
+      } else {
+        // Log.info('close and draw new window');
+        map.openInfoWindow(infoWindow, pnt);
+        // infoWindow.maximize();
       }
     };
-    updateInfoContentsWrapper = function () {
-      // console.fine(comp.getDisplayName())
-      return updateInfoContents.call(comp);
-    };
 
-    updateInfoContentsWrapperDebounce = _.debounce(updateInfoContentsWrapper, 500);
+
+    updateInfoContentsDebounce = _.debounce(updateInfoContents, 500);
 
     marker.addEventListener('click', function () {
-      // when click we only attach the updateInfoContentsWrapperDebounce function
-      updateInfoContentsWrapper();
-      compSub.attach('changed', updateInfoContentsWrapperDebounce);
+      // when click we only attach the updateInfoContentsDebounce function
+      updateInfoContents();
+      compSub.attach('changed', updateInfoContentsDebounce);
     });
 
     infoWindow.addEventListener('close', function () {
-      console.fine('close event fired');
-      compSub.detach('changed', updateInfoContentsWrapperDebounce);
-      if (!showAlarmIcon) {
+      compSub.detach('changed', updateInfoContentsDebounce);
+      if (!alwaysSubscribeAllPoints) {
         compSub.unsubscribeAll();
       }
     });
     infoWindow.addEventListener('clickclose', function () {
-      compSub.detach('changed', updateInfoContentsWrapperDebounce);
+      compSub.detach('changed', updateInfoContentsDebounce);
 
-      if (!showAlarmIcon) {
+      if (!alwaysSubscribeAllPoints) {
         compSub.unsubscribeAll();
       }
     });
