@@ -50,7 +50,7 @@ define([
       DEFAULT_FONT_SIZE = 12;
     that
       .properties()
-      .add('ak', 'ZwiEh3WHhKnNRX8Kb9i56NrBBk1VkwDq')
+      .add('ak', 'your-ak')
       .add('position', '116.404,39.915')
       .add({
         name: 'zoom',
