@@ -52,6 +52,9 @@ define([
       .properties()
       .add('ak', 'your-ak')
       .add('position', '116.404,39.915')
+      .add('titleTag', 'm:title')
+      .add('descriptionTag', 'm:description')
+      .add('imageSrcTag', 'm:imageSrc')
       .add({
         name: 'zoom',
         value: 15,
@@ -91,6 +94,9 @@ define([
       lat: parseFloat(position.length > 1 ? position[1].trim() : 0),
     };
   }
+  function getTagValue(comp, tagName) {
+    return comp.get(baja.ComponentTags.idToSlotName(tagName));
+  }
 
   /**
    * Retrieve the first Baidu map container element matched by the jQuery object.
@@ -123,7 +129,7 @@ define([
 
   BMapsWidget.prototype.doInitialize = function (dom) {
     var that = this;
-    console.fine('BMapsWidget initializing');
+    console.info('BMapsWidget initializing');
     dom.addClass(BMAPS_CLASS);
     dom.html(bMapsTemplate({}));
 
@@ -134,7 +140,7 @@ define([
     return new Promise(function (resolve, reject) {
       // wait for Baidu Map API to load inside the page
       require(['async!' + mapApi, 'async!' + mapGLApi], function () {
-        console.fine('Baidu Map API initialized');
+        console.info('Baidu Map API initialized');
         that.points = [];
         // utilize Baidu Map JavaScript
         that.$bmaps = BMapGL;
@@ -176,15 +182,24 @@ define([
 
         var searchList = new List('search-list', options, that.points);
         that.searchList = searchList;
-
+        console.info('11111111111111111');
+        // $('.list').hide();
         searchList.on('updated', function (list) {
           // we want to only show the results when searching, this is kinda a hacky way,
           // we do not want to show the points when the result is the whole list,
-          if (list.matchingItems.length == list.items.length) {
+          if (list.matchingItems.length > 5) {
             $('.list').hide();
-          } else {
+          } else if (list.searched) {
             $('.list').show();
           }
+        });
+        // console.info(searchList.search('pos2',['name']));
+
+        // searchList.on('searchComplete', function (list) {
+        //   $('.list').show();
+        // });
+        G('search-list').addEventListener('focusout', function (list) {
+          $('.list').hide();
         });
 
         resolve();
@@ -231,7 +246,8 @@ define([
       map = widget.$map,
       latLong = decodeLatLong(comp.get(baja.ComponentTags.idToSlotName('n:geoCoord'))),
       pnt = new bmaps.Point(latLong.lng, latLong.lat),
-      title = comp.getDisplay('title') || comp.getDisplayName(),
+      titleTag = widget.properties().getValue('titleTag'),
+      title = getTagValue(comp, titleTag) || comp.getDisplayName(),
       // todo : size global macro, now init with ok
       icon = new bmaps.Icon(ALARM_IMAGE_URI, new bmaps.Size(12, 20)),
       marker = new bmaps.Marker(pnt, {
@@ -248,7 +264,6 @@ define([
     // this requires constantly subscribe all the points, so performance is
     // bad, ony enable this when user enables
     var alwaysSubscribeAllPoints = widget.properties().getValue('alwaysSubscribeAllPoints');
-
     var compOrd = comp.getNavOrd().relativizeToSession().toString();
     var ordATag =
       "<a target='new' href='javascript:window.top.niagara.env.hyperlink(\"" +
@@ -284,8 +299,6 @@ define([
       var infoWindow = target.infoWindow;
       if (widget.properties().getValue('search3dAnimation')) {
         map.setTilt(50); // 设置地图初始倾斜角
-        // console.fine(JSON.stringify(local.getResults().getPoi(0)));
-        // console.fine(point);
         var keyFrames = [
           {
             center: point,
@@ -400,7 +413,7 @@ define([
     }
 
     updateInfoContents = function () {
-      console.fine('updating info window');
+      console.info('updating info window');
       var data = {
         ord: comp.getNavOrd().relativizeToSession().toString(),
         displayName: comp.getDisplay('title') || comp.getDisplayName(),
@@ -433,19 +446,28 @@ define([
       // ! for componenet itself (run once when click) slot should
       // ! be summary and should not change frequently
 
-      var targetSummarySlots = ['title', 'description', 'imgSrc'];
+      var targetSummarySlots = [
+        // widget.properties().getValue('titleTag'),
+        widget.properties().getValue('descriptionTag'),
+        widget.properties().getValue('imageSrcTag'),
+      ];
+      // console.info(targetSummarySlots);
+      comp.getSlots().each(function (slot) {
+        var displayName = comp.getDisplayName(slot);
 
+        if (targetSummarySlots.includes(displayName)) {
+          data[displayName.split(':')[1]] = comp.getDisplay(slot);
+          return;
+        }
+      });
       comp
         .getSlots()
         .flags(baja.Flags.SUMMARY)
         .each(function (slot) {
-          var displayName = comp.getDisplayName(slot);
-          // console.fine(slot);
-          if (targetSummarySlots.includes(displayName)) {
-            data[displayName] = comp.getDisplay(slot);
-            // console.fine(data);
-            return;
-          }
+          // if (targetSummarySlots.includes(displayName)) {
+          //   data[displayName] = comp.getDisplay(slot);
+          //   return;
+          // }
           // data.rows = data.rows || [];
           data.rows.push({
             displayName: comp.getDisplayName(slot),
@@ -467,7 +489,6 @@ define([
         // infoWindow.maximize();
       }
     };
-
 
     updateInfoContentsDebounce = _.debounce(updateInfoContents, 500);
 
@@ -495,7 +516,7 @@ define([
   BMapsWidget.prototype.doLoad = function (table) {
     var that = this;
 
-    console.fine('BMapsWidget loading');
+    console.info('BMapsWidget loading');
     // load the results of the query onto the Map.
     return table
       .cursor()
@@ -521,7 +542,6 @@ define([
         var ords = _.map(tagSets, function (tags) {
           return tags.get('n:ordInSession');
         });
-        // console.fine(ords);
 
         return new baja.BatchResolve(ords).resolve({ subscriber: that.getSubscriber() });
       })

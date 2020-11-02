@@ -197,10 +197,10 @@ input {
   margin-bottom: 10px;
 }
 .search-list {
-  z-index: 9999;
+  z-index: 5;
   position: fixed;
-  top: 3.5rem;
-  left: 50%;
+  top: 1rem;
+  left: 1rem;
   margin-left: 3rem;
   padding: 1rem 1rem;
   border-radius: 0.25rem;
