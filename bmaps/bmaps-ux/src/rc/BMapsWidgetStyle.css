@@ -66,10 +66,23 @@
 }
 .popup-description {
   color: #707070;
+  width: 200px;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow: hidden;
 }
 .popup-alarm-count {
-  color: #000000;
+  text-align: right;
+  padding-right: 10px;
 }
 .has-alarm {
   color: #EE3124;
+}
+table.table th {
+  background-color: #606060;
+  color: #FFFFFF;
+  font-weight: normal;
+}
+table.table td {
+  border: 0px;
 }

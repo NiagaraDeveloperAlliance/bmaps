@@ -4,9 +4,9 @@
 {{#if description}}
 <div class="popup-description">{{description}}</div>
 {{/if}}
-<div class="popup-alarm-count">{{alarmCount}} Alarms</div>
 <div class="info-window-props-container">
-  <table class="table table-bordered"><tbody>
+  <table class="table"><tbody>
+  <tr><th colspan="2"><div class="popup-alarm-count">{{alarmCount}} Alarms</div></th></tr>
   {{#if rows}}
     {{#each rows}}
       <tr>
