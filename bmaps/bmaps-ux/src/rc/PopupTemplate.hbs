@@ -1,39 +1,19 @@
-{{!-- <div class="info-window-container"> --}}
-  {{!-- <a target='new' href='javascript:window.top.niagara.env.hyperlink("{{ord}}");'>{{displayName}}</a> --}}
-{{!-- <h4>{{title}}</h4> --}}
 {{#if imageSrc}}
-<img src={{imageSrc}} width='100' height='100'alt="">
+<div class="popup-image"><img src={{imageSrc}}></div>
 {{/if}}
 {{#if description}}
-<p>{{description}}</p>
+<div class="popup-description">{{description}}</div>
 {{/if}}
-
-  {{!-- <tr>
-    <th>{{name}}</th>
-    <th>{{display}}</th>
-  </tr>   --}}
-  
-  <div>
-   <h5 style="display: inline;">Total alarms: {{alarmCount}}</h5>
-  </div>
-   
+<div class="popup-alarm-count">{{alarmCount}} Alarms</div>
 <div class="info-window-props-container">
-{{#if rows}}
+  <table class="table table-bordered"><tbody>
+  {{#if rows}}
     {{#each rows}}
-    {{!-- <tr> --}}
-      <div class="info-window-props-child">
-        <h5>{{displayName}}</h5>
-        {{!-- <div class="break"></div> --}}
-       <span> {{value}}</span>
-       {{#if alarm}}
-       <span class="alarm-text"> alarm</span>
-       {{/if}}
-      </div>
-      
-    {{!-- </tr> --}}
+      <tr>
+       <td>{{displayName}}</td>
+       <td><div {{#if alarm}}class="has-alarm"{{/if}}>{{value}}</div></td>
+      </tr>
     {{/each}}
   {{/if}}
+  </tbody></table>
 </div>
-<br />
-<br />
-{{!-- </div> --}}

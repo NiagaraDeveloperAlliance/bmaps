@@ -32,8 +32,6 @@ define([
     OK_IMAGE_URI = '/module/bmaps/rc/ok.png',
     ALARM_IMAGE_URI = '/module/bmaps/rc/alarm.gif',
     LEX = lexicons[0];
-  // let x= 2;
-  // console.info(x)
   /**
    * Loads a map into a widget. Queries the station to display live data.
    *
@@ -149,10 +147,8 @@ define([
         var point = new that.$bmaps.Point(central.lng, central.lat);
         that.$map.centerAndZoom(point, that.properties().getValue('zoom'));
         that.$map.enableScrollWheelZoom(true);
-        // that.$map.addControl(new that.$bmaps.NavigationControl3D());
         that.$map.addControl(new that.$bmaps.ScaleControl());
         that.$map.addControl(new that.$bmaps.MapTypeControl());
-        // that.$map.addControl(new that.$bmaps.MapTypeControl());
 
         that.$map.addControl(new that.$bmaps.ZoomControl());
 
@@ -182,8 +178,6 @@ define([
 
         var searchList = new List('search-list', options, that.points);
         that.searchList = searchList;
-        console.info('11111111111111111');
-        // $('.list').hide();
         searchList.on('updated', function (list) {
           // we want to only show the results when searching, this is kinda a hacky way,
           // we do not want to show the points when the result is the whole list,
@@ -193,11 +187,7 @@ define([
             $('.list').show();
           }
         });
-        // console.info(searchList.search('pos2',['name']));
 
-        // searchList.on('searchComplete', function (list) {
-        //   $('.list').show();
-        // });
         G('search-list').addEventListener('focusout', function (list) {
           $('.list').hide();
         });
@@ -264,15 +254,7 @@ define([
     // this requires constantly subscribe all the points, so performance is
     // bad, ony enable this when user enables
     var alwaysSubscribeAllPoints = widget.properties().getValue('alwaysSubscribeAllPoints');
-    var compOrd = comp.getNavOrd().relativizeToSession().toString();
-    var ordATag =
-      "<a target='new' href='javascript:window.top.niagara.env.hyperlink(\"" +
-      compOrd +
-      '");\'>' +
-      title +
-      '</a>';
-    infoWindow.setTitle(ordATag);
-    infoWindow.setHeight(600);
+    infoWindow.setTitle(title);
 
     // add marker to the map
     map.addOverlay(marker);
@@ -303,22 +285,15 @@ define([
           {
             center: point,
             zoom: 18,
-            // tilt: 50,
-            // heading: 0,
             percentage: 0,
           },
           {
             center: new bmaps.Point(pp.lng, pp.lag),
             zoom: 19,
-            // tilt: 70,
-            // heading: 0,
             percentage: 1,
           },
         ];
         var opts = {
-          // duration: 3000,
-          // delay: 1000,
-          // interation: 'INFINITE',
         };
 
         // 声明动画对象
@@ -391,7 +366,6 @@ define([
                   relation.getId().toString() === widget.properties().getValue('childRelation')
                 );
               })
-              // .map((relation) => baja.Ord.make('station:|'+relation.getEndpointOrd().toString()));
               .map(function (relation) {
                 return relation.getEndpointOrd();
               });
@@ -417,8 +391,6 @@ define([
       var data = {
         ord: comp.getNavOrd().relativizeToSession().toString(),
         displayName: comp.getDisplay('title') || comp.getDisplayName(),
-        // name: LEX.get('name'),
-        // display: LEX.get('display'),
         rows: [],
         alarmCount: 0,
       };
@@ -436,22 +408,16 @@ define([
           data.rows.push(row);
           return;
         }
-        var outValString = outVal.toString();
-        var index = outValString.indexOf('{'); //!!!!!!!!!! very bad
-        var displayValue = outValString.substring(0, index);
-        row.value = displayValue;
+        row.value = outVal.getValue();
         data.rows.push(row);
       });
 
       // ! for componenet itself (run once when click) slot should
       // ! be summary and should not change frequently
-
       var targetSummarySlots = [
-        // widget.properties().getValue('titleTag'),
         widget.properties().getValue('descriptionTag'),
         widget.properties().getValue('imageSrcTag'),
       ];
-      // console.info(targetSummarySlots);
       comp.getSlots().each(function (slot) {
         var displayName = comp.getDisplayName(slot);
 
@@ -464,11 +430,6 @@ define([
         .getSlots()
         .flags(baja.Flags.SUMMARY)
         .each(function (slot) {
-          // if (targetSummarySlots.includes(displayName)) {
-          //   data[displayName] = comp.getDisplay(slot);
-          //   return;
-          // }
-          // data.rows = data.rows || [];
           data.rows.push({
             displayName: comp.getDisplayName(slot),
             value: comp.getDisplay(slot) || comp.get(slot),
@@ -476,17 +437,12 @@ define([
         });
 
       infoWindow.setContent(popupTemplate(data));
-      // infoWindow.setMaxContent(popupTemplate(data));
 
-      // infoWindow.enableMaximize();
       if (infoWindow.isOpen()) {
-        // console.info('redraw window');
-        // redraw current infowindow
+        // redraw current infoWindow
         infoWindow.redraw();
       } else {
-        // Log.info('close and draw new window');
         map.openInfoWindow(infoWindow, pnt);
-        // infoWindow.maximize();
       }
     };
 
