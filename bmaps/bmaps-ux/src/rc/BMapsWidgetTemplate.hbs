@@ -18,10 +18,11 @@
     
 <div id="container"></div>
 <div id="search-list" class="search-list">
-    <input type="text" class="search" id="suggestId" placeholder="Search..." autocomplete="off"/>
+    <div id="clear-button" class="btn">clear</div>
+    <input type="text" class="search" id="search-input" placeholder="Search..." autocomplete="off"/>
     <div class="list" style="display: none;" ></div>
 </div>
-<div style="display:none;">
+<div id="search-item-template" style="display:none;">
   <!-- A template element is needed when list is empty, TODO: needs a better solution -->
   <span id="search-item">
   <h3 class="title btn"></h3>

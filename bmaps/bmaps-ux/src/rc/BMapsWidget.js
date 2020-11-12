@@ -145,7 +145,8 @@ define([
         that.$map = new that.$bmaps.Map(getMapContainer(dom));
         var central = decodeLatLong(that.properties().getValue('position'));
         var point = new that.$bmaps.Point(central.lng, central.lat);
-        that.$map.centerAndZoom(point, that.properties().getValue('zoom'));
+        var zoom = that.properties().getValue('zoom');
+        that.$map.centerAndZoom(point, zoom);
         that.$map.enableScrollWheelZoom(true);
         that.$map.addControl(new that.$bmaps.ScaleControl());
         that.$map.addControl(new that.$bmaps.MapTypeControl());
@@ -166,6 +167,10 @@ define([
             console.info('lng:{},lat:{}', e.point.lng, e.point.lat);
           });
         }
+
+        document.getElementById('clear-button').addEventListener('click', function (e) {
+          that.$map.centerAndZoom(point, zoom);
+        });
 
         var options = {
           item: 'search-item',
@@ -267,6 +272,7 @@ define([
     widget.points.push(target);
 
     widget.searchList.list.lastElementChild.addEventListener('click', function (e) {
+      document.getElementById('search-input').value = target.title;
       setPlace(target);
     });
 
