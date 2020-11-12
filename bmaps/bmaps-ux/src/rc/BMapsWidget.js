@@ -303,7 +303,7 @@ define([
         marker.setIcon(newIcon);
       }
     }
-    // fetch all children 
+    // fetch all children
     fetchChildren()
       .then(function () {
         updateIcon();
@@ -382,8 +382,7 @@ define([
         data.rows.push(row);
       });
 
-      // ! for componenet itself (run once when click) slot should
-      // ! be summary and should not change frequently
+      // get metadata, could merge this with the loop below, and make them one pass
       var targetSummarySlots = [DESCRIPTION_TAG, IMAGESRC_TAG];
       comp.getSlots().each(function (slot) {
         var displayName = comp.getDisplayName(slot);
