@@ -403,7 +403,14 @@ define([
           data.rows.push(row);
           return;
         }
-        row.value = outVal.getValue();
+        outVal = outVal.getValue();
+
+        if (typeof outVal == 'number') {
+          row.value = outVal.toFixed(2);
+        } else {
+          row.value = outVal;
+        }
+
         data.rows.push(row);
       });
 
