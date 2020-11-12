@@ -4,12 +4,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
     <style type="text/css">
-        body, html,#container {
+        body, html, #container {
             width: 100%;
             height: 100%;
             overflow: hidden;
             margin: 0;
-            font-family:sans-serif;
+            font-family: Arial, Helvetica, "Microsoft YaHei", sans-serif;
         }
     </style>
     <title>地图展示</title>
@@ -18,15 +18,14 @@
     
 <div id="container"></div>
 <div id="search-list" class="search-list">
-    <input type="text" class="search" id="suggestId" size="20" placeholder="Search" style="width:150px;" autocomplete="off"/>
-    <ul class="list" style="display: none;" ></ul>
+    <input type="text" class="search" id="suggestId" placeholder="Search..." autocomplete="off"/>
+    <div class="list" style="display: none;" ></div>
 </div>
-
 <div style="display:none;">
   <!-- A template element is needed when list is empty, TODO: needs a better solution -->
-  <li id="search-item">
-   <h3 class="title btn"></h3>
-  </li>
+  <span id="search-item">
+  <h3 class="title btn"></h3>
+  </span>
 </div>
 </body>
 </html>
