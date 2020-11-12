@@ -1,13 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bajaObjectGraph version="4.0" reversibleEncodingKeySource="none" FIPSEnabled="false" reversibleEncodingValidator="[null.1]=" >
 <p h="1" m="b=baja" t="b:UnrestrictedFolder">
- <!-- /bmaps -->
- <p n="BMaps" m="wb=workbench" t="wb:WebWidget">
+ <!-- /BMaps -->
+ <p n="BMaps" h="2" m="wb=workbench" t="wb:WebWidget">
   <p n="layout" m="ui=bajaui" t="ui:Layout" v="0.0,0.0,640.0,480.0"/>
   <p n="js" t="b:Ord" v="view:bmaps:BMapsWidget"/>
-  <!-- /bmaps/wbViewBinding -->
-  <p n="wbViewBinding" t="wb:WbViewBinding">
-    <p n="ord" v="station:|neql:n:geoCoord" />
+  <!-- /BMaps/wbViewBinding -->
+  <p n="wbViewBinding" h="4" t="wb:WbViewBinding">
+   <p n="ord" t="b:Ord" v="station:|neql:m:geoCoord"/>
+  </p>
+ </p>
+ <!-- /Tags -->
+ <p n="Tags" h="5" t="b:UnrestrictedFolder">
+  <!-- /Tags/Tags -->
+  <p n="Tags" h="6" m="td=tagdictionary" t="td:SmartTagDictionary">
+   <p n="namespace" v="m"/>
+   <p n="tagDefinitions" h="7" t="td:TagInfoList">
+    <!-- /Tags/Tags/tagDefinitions/child -->
+    <p n="child" h="b" t="td:SimpleTagInfo">
+     <p n="validity" h="c" t="td:Always">
+     </p>
+     <p n="defValue" t="b:String" v=""/>
+    </p>
+    <!-- /Tags/Tags/tagDefinitions/description -->
+    <p n="description" h="d" t="td:SimpleTagInfo">
+     <p n="validity" h="e" t="td:Always">
+     </p>
+     <p n="defValue" t="b:String" v=""/>
+    </p>
+    <!-- /Tags/Tags/tagDefinitions/imageSrc -->
+    <p n="imageSrc" h="f" t="td:SimpleTagInfo">
+     <p n="validity" h="10" t="td:Always">
+     </p>
+     <p n="defValue" t="b:String" v=""/>
+    </p>
+    <!-- /Tags/Tags/tagDefinitions/title -->
+    <p n="title" h="11" t="td:SimpleTagInfo">
+     <p n="validity" h="12" t="td:Always">
+     </p>
+     <p n="defValue" t="b:String" v=""/>
+    </p>
+   </p>
+   <p n="tagGroupDefinitions" h="8" t="td:TagGroupInfoList">
+   </p>
+   <p n="relationDefinitions" h="9" t="td:RelationInfoList">
+   </p>
+   <p n="tagRules" h="a" t="td:TagRuleList">
+   </p>
   </p>
  </p>
 </p>

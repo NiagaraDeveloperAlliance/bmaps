@@ -32,6 +32,10 @@ define([
     OK_IMAGE_URI = '/module/bmaps/rc/ok.png',
     ALARM_IMAGE_URI = '/module/bmaps/rc/alarm.gif',
     LEX = lexicons[0];
+  var TITLE_TAG = 'm:title',
+    DESCRIPTION_TAG = 'm:description',
+    IMAGESRC_TAG = 'm:imageSrc',
+    CHILD_TAG = 'm:child';
   /**
    * Loads a map into a widget. Queries the station to display live data.
    *
@@ -43,16 +47,10 @@ define([
     var that = this;
     Widget.apply(that, arguments);
 
-    var // => '12.0pt sans-serif'
-      DEFAULT_FONT_VALUE = 'null',
-      DEFAULT_FONT_SIZE = 12;
     that
       .properties()
       .add('ak', 'your-ak')
       .add('position', '116.404,39.915')
-      .add('titleTag', 'm:title')
-      .add('descriptionTag', 'm:description')
-      .add('imageSrcTag', 'm:imageSrc')
       .add({
         name: 'zoom',
         value: 15,
@@ -63,10 +61,8 @@ define([
         name: 'show3D',
         value: true,
         typeSpec: 'baja:Boolean',
-        metadata: { trueText: LEX.get('show3d'), falseText: LEX.get('hide3d') },
       })
       .add('icon', '')
-      .add('childRelation', 'm:child')
       .add('alwaysSubscribeAllPoints', true);
 
     subscriberMixIn(that);
@@ -131,7 +127,6 @@ define([
     dom.addClass(BMAPS_CLASS);
     dom.html(bMapsTemplate({}));
 
-    // todo remove this
     var mapApi = 'https://api.map.baidu.com/api?v=3.0&ak=' + that.properties().getValue('ak');
     var mapGLApi =
       'https://api.map.baidu.com/api?type=webgl&v=1.0&ak=' + that.properties().getValue('ak');
@@ -140,8 +135,10 @@ define([
       require(['async!' + mapApi, 'async!' + mapGLApi], function () {
         console.info('Baidu Map API initialized');
         that.points = [];
+        var show3D = that.properties().getValue('show3D');
+
         // utilize Baidu Map JavaScript
-        that.$bmaps = BMapGL;
+        that.$bmaps = show3D ? BMapGL : BMap;
         that.$map = new that.$bmaps.Map(getMapContainer(dom));
         var central = decodeLatLong(that.properties().getValue('position'));
         var point = new that.$bmaps.Point(central.lng, central.lat);
@@ -151,7 +148,7 @@ define([
         that.$map.addControl(new that.$bmaps.ScaleControl());
         that.$map.addControl(new that.$bmaps.MapTypeControl());
 
-        that.$map.addControl(new that.$bmaps.ZoomControl());
+        if (show3D) that.$map.addControl(new that.$bmaps.ZoomControl());
 
         // create center point icon
         var markerIcon = that.properties().getValue('icon');
@@ -235,10 +232,9 @@ define([
   function addMarker(widget, comp) {
     var bmaps = widget.$bmaps,
       map = widget.$map,
-      latLong = decodeLatLong(comp.get(baja.ComponentTags.idToSlotName('n:geoCoord'))),
+      latLong = decodeLatLong(comp.get(baja.ComponentTags.idToSlotName('m:geoCoord'))),
       pnt = new bmaps.Point(latLong.lng, latLong.lat),
-      titleTag = widget.properties().getValue('titleTag'),
-      title = getTagValue(comp, titleTag) || comp.getDisplayName(),
+      title = getTagValue(comp, TITLE_TAG) || comp.getDisplayName(),
       // todo : size global macro, now init with ok
       icon = new bmaps.Icon(ALARM_IMAGE_URI, new bmaps.Size(12, 20)),
       marker = new bmaps.Marker(pnt, {
@@ -281,39 +277,7 @@ define([
       var pos = target.pos;
       var point = new bmaps.Point(pos.lng, pos.lat);
       var infoWindow = target.infoWindow;
-      if (widget.properties().getValue('search3dAnimation')) {
-        map.setTilt(50); // 设置地图初始倾斜角
-        var keyFrames = [
-          {
-            center: point,
-            zoom: 18,
-            percentage: 0,
-          },
-          {
-            center: new bmaps.Point(pp.lng, pp.lag),
-            zoom: 19,
-            percentage: 1,
-          },
-        ];
-        var opts = {};
-
-        // 声明动画对象
-        var animation = new BMapGL.ViewAnimation(keyFrames, opts);
-        // 监听事件
-        animation.addEventListener('animationstart', function (e) {
-          console.fine('start');
-        });
-        animation.addEventListener('animationiterations', function (e) {
-          console.fine('onanimationiterations');
-        });
-        animation.addEventListener('animationend', function (e) {
-          console.fine('end');
-        });
-        // 开始播放动画
-        setTimeout(map.startViewAnimation(animation), 0);
-      } else {
-        map.centerAndZoom(point, 18);
-      }
+      map.centerAndZoom(point, 18);
 
       updateInfoContents();
       compSub.attach('changed', updateInfoContentsDebounce);
@@ -339,7 +303,7 @@ define([
         marker.setIcon(newIcon);
       }
     }
-
+    // fetch all children 
     fetchChildren()
       .then(function () {
         updateIcon();
@@ -363,9 +327,7 @@ define([
             var childOrds = relations
               .getAll() // todo get by id
               .filter(function (relation) {
-                return (
-                  relation.getId().toString() === widget.properties().getValue('childRelation')
-                );
+                return relation.getId().toString() === CHILD_TAG;
               })
               .map(function (relation) {
                 return relation.getEndpointOrd();
@@ -422,10 +384,7 @@ define([
 
       // ! for componenet itself (run once when click) slot should
       // ! be summary and should not change frequently
-      var targetSummarySlots = [
-        widget.properties().getValue('descriptionTag'),
-        widget.properties().getValue('imageSrcTag'),
-      ];
+      var targetSummarySlots = [DESCRIPTION_TAG, IMAGESRC_TAG];
       comp.getSlots().each(function (slot) {
         var displayName = comp.getDisplayName(slot);
 
@@ -500,7 +459,7 @@ define([
       })
       .then(function (tagSets) {
         tagSets = _.filter(tagSets, function (tags) {
-          return tags.contains('n:ordInSession') && tags.contains('n:geoCoord');
+          return tags.contains('n:ordInSession') && tags.contains('m:geoCoord');
         });
 
         var ords = _.map(tagSets, function (tags) {
