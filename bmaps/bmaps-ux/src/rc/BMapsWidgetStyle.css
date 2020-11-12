@@ -100,7 +100,6 @@ table.table td {
   scrollbar-width: thin;
   scrollbar-color: whitesmoke grey;
 }
-/* other */
 *::-webkit-scrollbar {
   width: 12px;
 }
