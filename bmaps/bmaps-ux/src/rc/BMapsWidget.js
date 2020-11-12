@@ -167,10 +167,6 @@ define([
           });
         }
 
-        function G(id) {
-          return document.getElementById(id);
-        }
-
         var options = {
           item: 'search-item',
           valueNames: ['title'],
