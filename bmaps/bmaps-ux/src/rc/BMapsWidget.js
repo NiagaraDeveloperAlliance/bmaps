@@ -188,7 +188,7 @@ define([
           }
         });
 
-        G('search-list').addEventListener('focusout', function (list) {
+        that.$map.addEventListener('click', function (e) {
           $('.list').hide();
         });
 
@@ -293,8 +293,7 @@ define([
             percentage: 1,
           },
         ];
-        var opts = {
-        };
+        var opts = {};
 
         // 声明动画对象
         var animation = new BMapGL.ViewAnimation(keyFrames, opts);
