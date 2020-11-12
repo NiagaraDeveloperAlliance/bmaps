@@ -1,19 +1,21 @@
-{{#if imageSrc}}
-<div class="popup-image"><img src={{imageSrc}}></div>
-{{/if}}
-{{#if description}}
-<div class="popup-description">{{description}}</div>
-{{/if}}
-<div class="info-window-props-container">
-  <table class="table"><tbody>
-  <tr><th colspan="2"><div class="popup-alarm-count">{{alarmCount}} Alarms</div></th></tr>
-  {{#if rows}}
-    {{#each rows}}
-      <tr>
-       <td>{{displayName}}</td>
-       <td><div {{#if alarm}}class="has-alarm"{{/if}}>{{value}}</div></td>
-      </tr>
-    {{/each}}
+<div class="popup-main">
+  {{#if imageSrc}}
+  <div class="popup-image"><img src={{imageSrc}}></div>
   {{/if}}
-  </tbody></table>
+  {{#if description}}
+  <div class="popup-description">{{description}}</div>
+  {{/if}}
+  <div class="info-window-props-container">
+    <table class="table"><tbody>
+    <tr><th colspan="2"><div class="popup-alarm-count">{{alarmCount}} Alarms</div></th></tr>
+    {{#if rows}}
+      {{#each rows}}
+        <tr>
+        <td>{{displayName}}</td>
+        <td><div {{#if alarm}}class="has-alarm"{{/if}}>{{value}}</div></td>
+        </tr>
+      {{/each}}
+    {{/if}}
+    </tbody></table>
+  </div>
 </div>

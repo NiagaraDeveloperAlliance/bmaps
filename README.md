@@ -65,11 +65,15 @@ git clone https://github.com/yiren1/bmaps.git
 从 palette 里找到 bmaps 模块：
 
 - 在该 Widget 的 View Binding 里配置好 NEQL 语句查找出所有打上 **m:geoCoord** 标签的点
-- infoWindow 会显示该点的信息以及该点子节点的信息
+
 - 点击地图上的配置好的点会弹出一个信息窗口：
-  - 显示出该点下所有标记为 SUMMARY 的 slot
+  - 显示出该点下 SUMMARY(m:title,m:imageSrc,m:description)
+  - 以及对应子节点的信息
+    - 子节点需要配置relation from parent **m:child**
   - 同时会订阅相应点的变化
-  - 点击窗口上链接会转向该点
+- 搜索
+  - 点击跳转
+- 初始化
 
 ### Properties
 
