@@ -50,6 +50,9 @@
    <p n="tagGroupDefinitions" h="8" t="td:TagGroupInfoList">
    </p>
    <p n="relationDefinitions" h="9" t="td:RelationInfoList">
+    <!-- /Tags/bmaps/relationDefinitions/child -->
+    <p n="child" h="16" t="td:RelationInfo">
+    </p>
    </p>
    <p n="tagRules" h="a" t="td:TagRuleList">
    </p>
