@@ -16,7 +16,6 @@
   <h3 align="center">bmaps Niagara Widget</h3>
 
   <p align="center">
-    An awesome README template to jumpstart your projects!
     <br />
     <a href="https://github.com/yiren1/bmaps"><strong>Explore the docs »</strong></a>
     <br />
@@ -36,8 +35,6 @@
 该项目参考 [gmaps-example](https://github.com/tridium/gmaps-example)，展示了如何将百度地图 JavaScript API 通过 bajaux Web Widget 的形式集成到 Niagara 中。
 
 ### Built With
-
-This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
 - [bootstrap](https://getbootstrap.com)
 - requirejs
