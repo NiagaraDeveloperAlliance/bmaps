@@ -40,6 +40,12 @@
      </p>
      <p n="defValue" t="b:String" v=""/>
     </p>
+    <!-- /Tags/Tags/tagDefinitions/geoCoord -->
+    <p n="geoCoord" h="13" t="td:SimpleTagInfo">
+     <p n="validity" h="14" t="td:Always">
+     </p>
+     <p n="defValue" t="b:String" v=""/>
+    </p>
    </p>
    <p n="tagGroupDefinitions" h="8" t="td:TagGroupInfoList">
    </p>

@@ -167,6 +167,8 @@ define([
 
         document.getElementById('clear-button').addEventListener('click', function (e) {
           that.$map.centerAndZoom(point, zoom);
+          that.$map.closeInfoWindow();
+          document.getElementById('search-input').value = '';
         });
 
         var options = {
@@ -184,6 +186,12 @@ define([
           } else if (list.searched) {
             $('.list').show();
           }
+        });
+
+        document.getElementById('search-input').addEventListener('keyup', function (e) {
+          console.info(e.target);
+          var searchString = e.target.value;
+          searchList.search(searchString);
         });
 
         that.$map.addEventListener('click', function (e) {

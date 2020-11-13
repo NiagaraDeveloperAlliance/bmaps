@@ -18,8 +18,22 @@
     
 <div id="container"></div>
 <div id="search-list" class="search-list">
-    <div id="clear-button" class="btn">clear</div>
-    <input type="text" class="search" id="search-input" placeholder="Search..." autocomplete="off"/>
+    {{!-- <div id="clear-button" class="btn">clear</div> --}}
+
+    <div class="row no-gutters">
+        {{!-- <input type="search" class="search form-control py-2 border-right-0 border" id="search-input" placeholder="Search..." autocomplete="off"/> --}}
+
+        <div class="col">
+            <input class="form-control border-secondary border-right-0 rounded-0" type="text" placeholder="search" id="search-input" autocomplete="off">
+        </div>
+        <div class="col-auto" id="clear-button">
+            <div class="btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
+                <i class="fa fa-close"></i>
+            </div>
+        </div>
+    </div>
+
+
     <div class="list" style="display: none;" ></div>
 </div>
 <div id="search-item-template" style="display:none;">
