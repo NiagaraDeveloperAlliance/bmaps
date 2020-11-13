@@ -282,6 +282,7 @@ define([
       map.centerAndZoom(point, 18);
 
       updateInfoContents();
+      map.openInfoWindow(infoWindow, pnt);
       compSub.attach('changed', updateInfoContentsDebounce);
       console.fine('setplace');
     }
@@ -409,8 +410,6 @@ define([
       if (infoWindow.isOpen()) {
         // redraw current infoWindow
         infoWindow.redraw();
-      } else {
-        map.openInfoWindow(infoWindow, pnt);
       }
     };
 
@@ -419,6 +418,7 @@ define([
     marker.addEventListener('click', function () {
       // when click we only attach the updateInfoContentsDebounce function
       updateInfoContents();
+      map.openInfoWindow(infoWindow, pnt);
       compSub.attach('changed', updateInfoContentsDebounce);
     });
 
