@@ -188,12 +188,6 @@ define([
           }
         });
 
-        document.getElementById('search-input').addEventListener('keyup', function (e) {
-          console.info(e.target);
-          var searchString = e.target.value;
-          searchList.search(searchString);
-        });
-
         that.$map.addEventListener('click', function (e) {
           $('.list').hide();
         });

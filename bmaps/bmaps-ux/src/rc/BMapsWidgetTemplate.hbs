@@ -18,16 +18,15 @@
     
 <div id="container"></div>
 <div id="search-list" class="search-list">
-    {{!-- <div id="clear-button" class="btn">clear</div> --}}
 
     <div class="row no-gutters">
-        {{!-- <input type="search" class="search form-control py-2 border-right-0 border" id="search-input" placeholder="Search..." autocomplete="off"/> --}}
 
         <div class="col">
-            <input class="form-control border-secondary border-right-0 rounded-0" type="text" placeholder="search" id="search-input" autocomplete="off">
+            {{!-- class search is indicating the search input for listjs --}}
+            <input class="search form-control border-secondary border-right-0 rounded-0" type="text" placeholder="search" id="search-input" autocomplete="off">
         </div>
         <div class="col-auto" id="clear-button">
-            <div class="btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
+            <div class="clear-button btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
                 <i class="fa fa-close"></i>
             </div>
         </div>
