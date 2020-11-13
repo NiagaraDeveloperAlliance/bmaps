@@ -21,7 +21,7 @@
     <a href="https://github.com/yiren1/bmaps"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/yiren1/bmaps">View Demo</a>
+    <a href="https://github.com/YIREN1/bmaps/about-the-project">View Demo</a>
     ·
     <a href="https://github.com/yiren1/bmaps/issues">Report Bug</a>
     ·
@@ -31,7 +31,7 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](images/screenshot.png)
+[![Product Name Screen Shot][product-screenshot]]()
 
 该项目参考 [gmaps-example](https://github.com/tridium/gmaps-example)，展示了如何将百度地图 JavaScript API 通过 bajaux Web Widget 的形式集成到 Niagara 中。
 
@@ -40,6 +40,9 @@
 This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
 - [bootstrap](https://getbootstrap.com)
+- requirejs
+- listjs
+- baidu maps
 - [bajascript](https://jquery.com)
 - [bajaux](https://laravel.com)
 
@@ -49,7 +52,7 @@ This section should list any major frameworks that you built your project using.
 
 ### Installation
 
-1. 在使用前，需要先从百度地图开发平台申请密钥 [application key(ak)](http://lbsyun.baidu.com/apiconsole/key?application=key)
+1. apply for a [application key(ak)](http://lbsyun.baidu.com/apiconsole/key?application=key)
 2. Clone the repo
 
 ```sh
@@ -58,7 +61,7 @@ git clone https://github.com/yiren1/bmaps.git
 
 3. Build Gradle
 
-4. Enter your API in properties
+4. Enter your ak in properties
 
 ## Usage
 
@@ -112,8 +115,6 @@ git clone https://github.com/yiren1/bmaps.git
 
 [Niagara 与 GIS 系统的集成](Integrate-Niagara-with-GIS.pdf)
 
-分享于 2019 Tridium 中国合作伙伴峰会开发培训
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
@@ -130,4 +131,4 @@ git clone https://github.com/yiren1/bmaps.git
 [license-url]:
 [linkedin-url]:  -->
 
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: images/demo.gif
