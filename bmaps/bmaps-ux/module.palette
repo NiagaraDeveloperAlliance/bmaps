@@ -12,35 +12,35 @@
  </p>
  <!-- /Tags -->
  <p n="Tags" h="5" t="b:UnrestrictedFolder">
-  <!-- /Tags/Tags -->
-  <p n="Tags" h="6" m="td=tagdictionary" t="td:SmartTagDictionary">
+  <!-- /Tags/bmaps -->
+  <p n="bmaps" h="6" m="td=tagdictionary" t="td:SmartTagDictionary">
    <p n="namespace" v="m"/>
    <p n="tagDefinitions" h="7" t="td:TagInfoList">
-    <!-- /Tags/Tags/tagDefinitions/child -->
+    <!-- /Tags/bmaps/tagDefinitions/child -->
     <p n="child" h="b" t="td:SimpleTagInfo">
      <p n="validity" h="c" t="td:Always">
      </p>
      <p n="defValue" t="b:String" v=""/>
     </p>
-    <!-- /Tags/Tags/tagDefinitions/description -->
+    <!-- /Tags/bmaps/tagDefinitions/description -->
     <p n="description" h="d" t="td:SimpleTagInfo">
      <p n="validity" h="e" t="td:Always">
      </p>
      <p n="defValue" t="b:String" v=""/>
     </p>
-    <!-- /Tags/Tags/tagDefinitions/imageSrc -->
+    <!-- /Tags/bmaps/tagDefinitions/imageSrc -->
     <p n="imageSrc" h="f" t="td:SimpleTagInfo">
      <p n="validity" h="10" t="td:Always">
      </p>
      <p n="defValue" t="b:String" v=""/>
     </p>
-    <!-- /Tags/Tags/tagDefinitions/title -->
+    <!-- /Tags/bmaps/tagDefinitions/title -->
     <p n="title" h="11" t="td:SimpleTagInfo">
      <p n="validity" h="12" t="td:Always">
      </p>
      <p n="defValue" t="b:String" v=""/>
     </p>
-    <!-- /Tags/Tags/tagDefinitions/geoCoord -->
+    <!-- /Tags/bmaps/tagDefinitions/geoCoord -->
     <p n="geoCoord" h="13" t="td:SimpleTagInfo">
      <p n="validity" h="14" t="td:Always">
      </p>
