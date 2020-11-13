@@ -7,7 +7,7 @@
 
 .search-list {
   z-index: 5;
-  position: fixed;
+  position: absolute;
   top: 20px;
   left: 20px;
   background-color: #fff;
