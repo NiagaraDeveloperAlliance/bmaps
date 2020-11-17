@@ -63,7 +63,7 @@ define([
         typeSpec: 'baja:Boolean',
       })
       .add('icon', '')
-      .add('alwaysSubscribeAllPoints', true);
+      .add('showAlarmIcon', true);
 
     subscriberMixIn(that);
   };
@@ -238,7 +238,7 @@ define([
       pnt = new bmaps.Point(latLong.lng, latLong.lat),
       title = getTagValue(comp, TITLE_TAG) || comp.getDisplayName(),
       // todo : size global macro, now init with ok
-      icon = new bmaps.Icon(ALARM_IMAGE_URI, new bmaps.Size(12, 20)),
+      icon = new bmaps.Icon(OK_IMAGE_URI, new bmaps.Size(12, 20)),
       marker = new bmaps.Marker(pnt, {
         icon: icon,
         title: title,
@@ -252,7 +252,7 @@ define([
     var hasAlarm = false;
     // this requires constantly subscribe all the points, so performance is
     // bad, ony enable this when user enables
-    var alwaysSubscribeAllPoints = widget.properties().getValue('alwaysSubscribeAllPoints');
+    var showAlarmIcon = widget.properties().getValue('showAlarmIcon');
     infoWindow.setTitle(title);
 
     // add marker to the map
@@ -306,21 +306,19 @@ define([
         marker.setIcon(newIcon);
       }
     }
-    // fetch all children
-    fetchChildren()
-      .then(function () {
-        updateIcon();
-        // since we already subscribe all the points before click
-        // the updateIcon function does not seem to a lot of work,
-        // it might be ok to run this without the if statement,
-        // we just need to unsubscribe after close
-        if (alwaysSubscribeAllPoints) {
+
+    if (showAlarmIcon) {
+      // fetch all children at the initialization
+      fetchChildren()
+        .then(function () {
+          updateIcon();
+
           compSub.attach('changed', _.debounce(updateIcon, 200));
-        }
-      })
-      .catch(function (err) {
-        console.fine('failed: update icon ' + err);
-      });
+        })
+        .catch(function (err) {
+          console.fine('failed: update icon ' + err);
+        });
+    }
 
     function fetchChildren() {
       return new Promise(function (resolve, reject) {
@@ -415,23 +413,34 @@ define([
 
     updateInfoContentsDebounce = _.debounce(updateInfoContents, 500);
 
-    marker.addEventListener('click', function () {
-      // when click we only attach the updateInfoContentsDebounce function
+    function handleClickMarkerEvent() {
       updateInfoContents();
       map.openInfoWindow(infoWindow, pnt);
       compSub.attach('changed', updateInfoContentsDebounce);
+    }
+
+    marker.addEventListener('click', function () {
+      if (showAlarmIcon) {
+        handleClickMarkerEvent();
+      } else {
+        fetchChildren().then(function () {
+          handleClickMarkerEvent();
+        });
+      }
+
+      // when click we only attach the updateInfoContentsDebounce function
     });
 
     infoWindow.addEventListener('close', function () {
       compSub.detach('changed', updateInfoContentsDebounce);
-      if (!alwaysSubscribeAllPoints) {
+      if (!showAlarmIcon) {
         compSub.unsubscribeAll();
       }
     });
     infoWindow.addEventListener('clickclose', function () {
       compSub.detach('changed', updateInfoContentsDebounce);
 
-      if (!alwaysSubscribeAllPoints) {
+      if (!showAlarmIcon) {
         compSub.unsubscribeAll();
       }
     });
