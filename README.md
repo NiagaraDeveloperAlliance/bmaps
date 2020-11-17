@@ -64,12 +64,12 @@ git clone https://github.com/yiren1/bmaps.git
 
 从 palette 里找到 bmaps 模块：
 
-- 在该 Widget 的 View Binding 里配置好 NEQL 语句查找出所有打上 **m:geoCoord** 标签的点
+- 在该 Widget 的 View Binding 里配置好 NEQL 语句查找出所有打上 **m:geoCoord**(坐标string) 标签的点
 
 - 点击地图上的配置好的点会弹出一个信息窗口：
-  - 显示出该点下 SUMMARY(m:title,m:imageSrc,m:description)
+  - 显示出该点下 SUMMARY 需用tags(m:title,m:imageSrc,m:description)
   - 以及对应子节点的信息
-    - 子节点需要配置 relation from parent **m:child**
+    - 子节点需要配置 relation **from** parent **m:child**
   - 同时会订阅相应点的变化
 - 搜索
   - 点击跳转
@@ -91,7 +91,7 @@ git clone https://github.com/yiren1/bmaps.git
 - icon: 配置中心点坐标处的图标，类似`/ord/file:^tridium.png`
 - show3D: if true (default) show 3d map
 - showAlarmIcon, if true (default) widget will automatically subscribe all points that is related,
-  this might slow performance if there are a lot of points. if false, user will not be able to see icon changes in the map(for performance)
+  this might slow performance if there are a lot of points. if false, user will not be able to see icon changes in the map, but subscriber will only subscribe corresponding points when the user clicks a marker 
 
 ## Original Author
 
