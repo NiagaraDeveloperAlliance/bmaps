@@ -91,7 +91,7 @@ git clone https://github.com/yiren1/bmaps.git
 - icon: 配置中心点坐标处的图标，类似`/ord/file:^tridium.png`
 - show3D: if true (default) show 3d map
 - alwaysSubscribeAllPoints, if true (default) widget will automatically subscribe all points that is related,
-  this might slow performance if there are a lot of points. If false, after user close any info window, widget will unsubscribeAll since we do not need to watch any changes after the window is closed. And component will start watching changes again when user clicks any marker.
+  this might slow performance if there are a lot of points. If false, after user close any info window, component subscriber will unsubscribeAll since we do not need to watch any changes after the window is closed. And component subscriber will start watching changes again when user clicks any marker.
   This is useful if the user want to see the icon change when alarm status is changed for any child component(in this case alwaysSubscribeAllPoints should be set to true)
 
 ## Original Author
@@ -105,7 +105,7 @@ git clone https://github.com/yiren1/bmaps.git
 
 任毅
 
-- software engineer intern, Tridium AP
+- Software Engineer Intern, Tridium AP
 
 ## License
 
