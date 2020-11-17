@@ -75,7 +75,7 @@ git clone https://github.com/yiren1/bmaps.git
   - 点击跳转
   - 根据 title 搜索，如果没有 title，根据 displayName
 - 初始化
-  - 点击search box旁的x将初始化地图并关闭所有infowindow
+  - 点击 search box 旁的 x 将初始化地图并关闭所有 infowindow
 
 ### Properties
 
@@ -90,9 +90,8 @@ git clone https://github.com/yiren1/bmaps.git
 - footprint: 启用后会在浏览器控制台打印出百度地图上鼠标点击处的百度坐标，默认未启用
 - icon: 配置中心点坐标处的图标，类似`/ord/file:^tridium.png`
 - show3D: if true (default) show 3d map
-- alwaysSubscribeAllPoints, if true (default) widget will automatically subscribe all points that is related,
-  this might slow performance if there are a lot of points. If false, after user close any info window, component subscriber will unsubscribeAll since we do not need to watch any changes after the window is closed. And component subscriber will start watching changes again when user clicks any marker.
-  This is useful if the user want to see the icon change when alarm status is changed for any child component(in this case alwaysSubscribeAllPoints should be set to true)
+- showAlarmIcon, if true (default) widget will automatically subscribe all points that is related,
+  this might slow performance if there are a lot of points. if false, user will not be able to see icon changes in the map(for performance)
 
 ## Original Author
 
