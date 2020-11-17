@@ -40,8 +40,8 @@
 - requirejs
 - listjs
 - baidu maps
-- [bajascript](https://jquery.com)
-- [bajaux](https://laravel.com)
+- bajascript
+- bajaux
 
 <!-- GETTING STARTED -->
 
@@ -69,11 +69,13 @@ git clone https://github.com/yiren1/bmaps.git
 - 点击地图上的配置好的点会弹出一个信息窗口：
   - 显示出该点下 SUMMARY(m:title,m:imageSrc,m:description)
   - 以及对应子节点的信息
-    - 子节点需要配置relation from parent **m:child**
+    - 子节点需要配置 relation from parent **m:child**
   - 同时会订阅相应点的变化
 - 搜索
   - 点击跳转
+  - 根据 title 搜索，如果没有 title，根据 displayName
 - 初始化
+  - 点击search box旁的x将初始化地图并关闭所有infowindow
 
 ### Properties
 
@@ -87,9 +89,10 @@ git clone https://github.com/yiren1/bmaps.git
 
 - footprint: 启用后会在浏览器控制台打印出百度地图上鼠标点击处的百度坐标，默认未启用
 - icon: 配置中心点坐标处的图标，类似`/ord/file:^tridium.png`
-- show3D: if true show 3d map
-- alwaysSubscribeAllPoints, if true widget will automatically subscribe all points that is related,
-  this might slow performance if there are a lot of points. If false, after user close any info window, widget will unsubscribeAll since we do not need to watch any changes after the window is closed. This is useful if the user want to see the icon change when alarm status is changed for any child component
+- show3D: if true (default) show 3d map
+- alwaysSubscribeAllPoints, if true (default) widget will automatically subscribe all points that is related,
+  this might slow performance if there are a lot of points. If false, after user close any info window, widget will unsubscribeAll since we do not need to watch any changes after the window is closed. And component will start watching changes again when user clicks any marker.
+  This is useful if the user want to see the icon change when alarm status is changed for any child component(in this case alwaysSubscribeAllPoints should be set to true)
 
 ## Original Author
 
@@ -118,7 +121,7 @@ git clone https://github.com/yiren1/bmaps.git
 [contributors-shield]: https://img.shields.io/github/contributors/yiren1/bmaps.svg?style=flat-square
 [contributors-url]: https://github.com/yiren1/bmaps/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/yiren1/bmaps.svg?style=flat-square
-[forks-url]: https://github.com/yiren1/bmaps/graphs/forks
+[forks-url]: https://github.com/yiren1/bmaps/network/members
 
 <!-- [stars-shield]:
 [stars-url]:
