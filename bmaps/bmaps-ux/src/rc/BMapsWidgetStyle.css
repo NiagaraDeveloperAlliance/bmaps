@@ -1,7 +1,125 @@
-div.bMapsWidget {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  padding: 0;
-  overflow: hidden !important;
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css');
+@import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+.BMap_bubble_title {
+  font-weight: bold;
+}
+
+.search-list {
+  z-index: 5;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #fff;
+  height: 38px;
+  width: 200px;
+  box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
+}
+
+.search {
+  box-sizing: border-box;
+  padding: 9px 0;
+  line-height: 20px;
+  font-size: 16px;
+  height: 38px;
+  color: #333;
+  position: relative;
+  border-radius: 2px 0 0 2px;
+  box-shadow: none !important;
+  border-width: 1px !important;
+  border-color: rgba(160, 160, 160, 0.75) !important;
+}
+
+.clear-button {
+  border-color: rgba(160, 160, 160, 0.75) !important;
+  background-color: #fff;
+}
+
+.form-control:focus {
+  outline: 0 !important;
+  border-color: initial;
+  box-shadow: none;
+}
+
+.list {
+  pointer-events: auto;
+  position: absolute;
+  width: 200px;
+  left: 0px;
+  top: 40px;
+  z-index: 5;
+  -webkit-transition: visibility 0.5s;
+  transition: visibility 0.5s;
+}
+.list > span {
+  display: block;
+  background-color: #eee;
+  width: 200px;
+}
+.title.btn {
+  text-align: left;
+  width: 200px;
+}
+.title.btn:hover {
+  background-color: rgba(27, 142, 236, 0.8);
+  color: #fff;
+}
+
+.popup-image {
+  width: auto;
+  height: 120px;
+  align-items: center;
+  justify-content: left;
+  overflow: hidden;
+}
+.popup-image > img {
+  width: auto;
+  height: 120px;
+}
+.popup-description {
+  color: #707070;
+  width: 200px;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow: hidden;
+}
+.popup-alarm-count {
+  text-align: right;
+  padding-right: 10px;
+}
+.has-alarm {
+  color: #ee3124;
+}
+table.table th {
+  background-color: #606060;
+  color: #ffffff;
+  font-weight: normal;
+}
+table.table td {
+  border: 0px;
+}
+
+.popup-main {
+  max-height: 440px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* scrollbar */
+
+/* firefix */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: whitesmoke grey;
+}
+*::-webkit-scrollbar {
+  width: 12px;
+}
+*::-webkit-scrollbar-track {
+  background: whitesmoke;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: grey;
+  border-radius: 20px;
+  border: 3px solid grey;
 }

@@ -9,12 +9,37 @@
             height: 100%;
             overflow: hidden;
             margin: 0;
-            font-family: "微软雅黑";
+            font-family: Arial, Helvetica, "Microsoft YaHei", sans-serif;
         }
     </style>
     <title>地图展示</title>
 </head>
 <body>
+    
 <div id="container"></div>
+<div id="search-list" class="search-list">
+
+    <div class="row no-gutters">
+
+        <div class="col">
+            {{!-- class search is indicating the search input for listjs --}}
+            <input class="search form-control border-secondary border-right-0 rounded-0" type="text" placeholder="search" id="search-input" autocomplete="off">
+        </div>
+        <div class="col-auto" id="clear-button">
+            <div class="clear-button btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
+                <i class="fa fa-close"></i>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="list" style="display: none;" ></div>
+</div>
+<div id="search-item-template" style="display:none;">
+  <!-- A template element is needed when list is empty, TODO: needs a better solution -->
+  <span id="search-item">
+  <h3 class="title btn"></h3>
+  </span>
+</div>
 </body>
 </html>
